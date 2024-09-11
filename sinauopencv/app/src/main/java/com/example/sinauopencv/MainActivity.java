@@ -14,8 +14,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        if(OpenCVLoader.initDebug()) Log.d("LOADED", "success");
-        else Log.d("LOADED", "error");
+        if(OpenCVLoader.initDebug()) Log.d("LOADED", "success!");
+        else Log.d("LOADED", "failed");
     }
-
 }

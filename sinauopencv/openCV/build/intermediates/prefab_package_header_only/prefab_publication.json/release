@@ -1,14 +1,14 @@
 {
-  "installationFolder": "D:\\Kaleb\\Kuliah\\.KP\\sinauopencv\\openCV\\build\\intermediates\\prefab_package\\release\\prefab",
-  "gradlePath": ":openCV",
+  "installationFolder": "D:\\Kaleb\\Kuliah\\.KP\\github\\KPTraining\\sinauopencv\\opencv\\build\\intermediates\\prefab_package\\release\\prefab",
+  "gradlePath": ":opencv",
   "packageInfo": {
-    "packageName": "openCV",
+    "packageName": "opencv",
     "packageSchemaVersion": 2,
     "packageDependencies": [],
     "modules": [
       {
         "moduleName": "opencv_jni_shared",
-        "moduleHeaders": "D:\\Kaleb\\Kuliah\\.KP\\sinauopencv\\openCV\\native\\jni\\include",
+        "moduleHeaders": "D:\\Kaleb\\Kuliah\\.KP\\github\\KPTraining\\sinauopencv\\opencv\\native\\jni\\include",
         "moduleExportLibraries": [],
         "abis": []
       }
