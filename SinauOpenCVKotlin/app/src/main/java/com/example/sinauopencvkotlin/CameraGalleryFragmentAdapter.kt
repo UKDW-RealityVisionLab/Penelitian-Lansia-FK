@@ -10,10 +10,12 @@ class CameraGalleryFragmentAdapter(
     lifecycle: Lifecycle
 ) : FragmentStateAdapter(fragmentManager, lifecycle) {
     override fun getItemCount(): Int {
-        TODO("Not yet implemented")
+        return 2
     }
 
     override fun createFragment(position: Int): Fragment {
-        if(position)
+        return if(position == 0) GalleryFragment()
+        else CameraFragment()
+
     }
 }
