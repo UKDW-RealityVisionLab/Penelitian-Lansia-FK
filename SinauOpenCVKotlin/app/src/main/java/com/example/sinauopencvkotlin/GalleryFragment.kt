@@ -5,6 +5,7 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,8 +18,8 @@ import org.opencv.core.Mat
 import java.io.IOException
 
 class GalleryFragment : Fragment() {
-//    var bitmap: Bitmap? = null
-//    var mat: Mat? = null
+    private var bitmap: Bitmap? = null
+    private var mat: Mat? = null
 
     companion object {
         private var SELECT_CODE = 0
@@ -49,7 +50,8 @@ class GalleryFragment : Fragment() {
         if(requestCode==SELECT_CODE && resultCode == Activity.RESULT_OK){
             try {
                 val imageUri: Uri? = data?.data
-                binding.imageView.setImageURI(imageUri)
+                bitmap = MediaStore.Images.Media.getBitmap(requireContext().contentResolver, imageUri)
+                binding.imageView.setImageBitmap(bitmap)
 //                mat = Mat()
 //                Utils.bitmapToMat(bitmap, mat)
             } catch (e: IOException) {
