@@ -41,6 +41,7 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation project(':opencv')
     implementation 'com.google.mediapipe:tasks-vision:latest.release'
+    implementation 'androidx.fragment:fragment-ktx:1.8.3'
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.2.1'
