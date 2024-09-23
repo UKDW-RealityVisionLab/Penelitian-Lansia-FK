@@ -3,54 +3,182 @@ package com.example.sinauopencvkotlin
 import android.app.Activity
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.ImageDecoder
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
+import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import com.example.sinauopencvkotlin.databinding.FragmentGalleryBinding
+import com.google.common.net.MediaType
+import com.google.mediapipe.tasks.vision.core.RunningMode
+import org.opencv.android.NativeCameraView.TAG
 import org.opencv.android.Utils
 import org.opencv.core.Mat
 import java.io.IOException
+import java.util.concurrent.Executors
+import java.util.concurrent.ScheduledExecutorService
 
 class GalleryFragment : Fragment() {
+    enum class MediaType {
+        IMAGE,
+        UNKNOWN
+    }
+
     private var bitmap: Bitmap? = null
     private var mat: Mat? = null
 
     companion object {
         private var SELECT_CODE = 0
     }
+
     private var _binding: FragmentGalleryBinding? = null
     private val binding get() = _binding!!
+
+    private lateinit var poseLandmarkerHelper: PoseLandmarkerHelper
+    private val viewModel: MainViewModel by activityViewModels()
+    private lateinit var galleryExecutor: ScheduledExecutorService
+
+    private val getImage =
+        registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
+            uri?.let { imageUri ->
+                when (val mediaType = loadMediaType(imageUri)) {
+                    MediaType.IMAGE -> runDetectionOnImage(imageUri)
+                    MediaType.UNKNOWN -> {
+                        updateDisplayView(mediaType)
+                        Toast.makeText(
+                            requireContext(),
+                            "Unsupported data type",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+            }
+        }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentGalleryBinding.inflate(inflater, container, false)
-        pickImage()
+//        pickImage()
         return binding.root
     }
 
-    fun pickImage() {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         binding.pickerButton.setOnClickListener {
-            val intent = Intent(Intent.ACTION_PICK)
-            intent.type = "image/*"
-            startActivityForResult(intent, SELECT_CODE)
+            getImage.launch(arrayOf("image/*"))
         }
     }
 
+    override fun onPause() {
+        binding.overlay.clear()
+        super.onPause()
+    }
+
+//    fun pickImage() {
+//        binding.pickerButton.setOnClickListener {
+//            val intent = Intent(Intent.ACTION_PICK)
+//            intent.type = "image/*"
+//            startActivityForResult(intent, SELECT_CODE)
+//        }
+//    }
+
+    private fun runDetectionOnImage(uri: Uri) {
+        galleryExecutor = Executors.newSingleThreadScheduledExecutor()
+        updateDisplayView(MediaType.IMAGE)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            val source = ImageDecoder.createSource(
+                requireActivity().contentResolver,
+                uri
+            )
+            ImageDecoder.decodeBitmap(source)
+        } else {
+            MediaStore.Images.Media.getBitmap(
+                requireActivity().contentResolver,
+                uri
+            )
+        }
+            .copy(Bitmap.Config.ARGB_8888, true)
+            ?.let { bitmap ->
+                binding.imageView.setImageBitmap(bitmap)
+
+                // Run pose landmarker on the input image
+                galleryExecutor.execute {
+
+                    poseLandmarkerHelper =
+                        PoseLandmarkerHelper(
+                            context = requireContext(),
+                            runningMode = RunningMode.IMAGE,
+                            minPoseDetectionConfidence = viewModel.currentMinPoseDetectionConfidence,
+                            minPoseTrackingConfidence = viewModel.currentMinPoseTrackingConfidence,
+                            minPosePresenceConfidence = viewModel.currentMinPosePresenceConfidence,
+                            currentDelegate = viewModel.currentDelegate
+                        )
+
+                    poseLandmarkerHelper.detectImage(bitmap)?.let { result ->
+                        activity?.runOnUiThread {
+                            binding.overlay.setResults(
+                                result.results[0],
+                                bitmap.height,
+                                bitmap.width,
+                                RunningMode.IMAGE
+                            )
+                        } ?: run { Log.e(TAG, "Error running pose landmarker.") }
+
+                        poseLandmarkerHelper.clearPoseLandmarker()
+                    }
+                }
+            }
+    }
+
+    fun updateDisplayView(mediaType: MediaType) {
+        binding.imageView.visibility =
+            if (mediaType == MediaType.IMAGE) View.VISIBLE else View.GONE
+    }
+
+    fun loadMediaType(uri: Uri): MediaType {
+        val mimeType = context?.contentResolver?.getType(uri)
+        mimeType?.let {
+            if (mimeType.startsWith("image")) return MediaType.IMAGE
+        }
+
+        return MediaType.UNKNOWN
+    }
+
+    fun classifyingError() {
+        activity?.runOnUiThread {
+            binding.progress.visibility = View.GONE
+            updateDisplayView(MediaType.IMAGE)
+        }
+    }
+
+    fun onResults(resultBundle: PoseLandmarkerHelper.ResultBundle) {
+        // no-op
+    }
+
+
+    @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        if(requestCode==SELECT_CODE && resultCode == Activity.RESULT_OK){
+        if (requestCode == SELECT_CODE && resultCode == Activity.RESULT_OK) {
             try {
                 val imageUri: Uri? = data?.data
-                bitmap = MediaStore.Images.Media.getBitmap(requireContext().contentResolver, imageUri)
+                bitmap = MediaStore.Images.Media.getBitmap(
+                    requireContext().contentResolver,
+                    imageUri
+                )
                 binding.imageView.setImageBitmap(bitmap)
 //                mat = Mat()
 //                Utils.bitmapToMat(bitmap, mat)
@@ -59,5 +187,6 @@ class GalleryFragment : Fragment() {
             }
         }
     }
+
 }
 
