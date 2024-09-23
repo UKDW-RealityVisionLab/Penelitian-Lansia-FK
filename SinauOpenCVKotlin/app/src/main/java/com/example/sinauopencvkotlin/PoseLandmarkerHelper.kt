@@ -33,11 +33,11 @@ import com.google.mediapipe.tasks.vision.poselandmarker.PoseLandmarker
 import com.google.mediapipe.tasks.vision.poselandmarker.PoseLandmarkerResult
 
 class PoseLandmarkerHelper(
-    private var minPoseDetectionConfidence: Float = DEFAULT_POSE_DETECTION_CONFIDENCE,
-    private var minPoseTrackingConfidence: Float = DEFAULT_POSE_TRACKING_CONFIDENCE,
-    private var minPosePresenceConfidence: Float = DEFAULT_POSE_PRESENCE_CONFIDENCE,
+    var minPoseDetectionConfidence: Float = DEFAULT_POSE_DETECTION_CONFIDENCE,
+    var minPoseTrackingConfidence: Float = DEFAULT_POSE_TRACKING_CONFIDENCE,
+    var minPosePresenceConfidence: Float = DEFAULT_POSE_PRESENCE_CONFIDENCE,
     private var currentModel: Int = MODEL_POSE_LANDMARKER_FULL,
-    private var currentDelegate: Int = DELEGATE_CPU,
+    var currentDelegate: Int = DELEGATE_CPU,
     private var runningMode: RunningMode = RunningMode.IMAGE,
     private val context: Context,
     // this listener is only used when running in RunningMode.LIVE_STREAM

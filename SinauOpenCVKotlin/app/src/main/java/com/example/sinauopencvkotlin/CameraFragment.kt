@@ -33,6 +33,7 @@ import java.util.concurrent.Executors
 
 //Mediapipe
 import com.google.mediapipe.tasks.vision.core.RunningMode
+import java.util.concurrent.TimeUnit
 
 typealias LumaListener = (luma : Double) -> Unit
 
@@ -56,6 +57,32 @@ class  CameraFragment : Fragment() {
     private var _binding: FragmentCameraBinding? = null
     private val binding get() = _binding!!
 
+    override fun onPause() {
+        super.onPause()
+        if(this::poseLandmarkerHelper.isInitialized) {
+            viewModel.setMinPoseDetectionConfidence(poseLandmarkerHelper.minPoseDetectionConfidence)
+            viewModel.setMinPoseTrackingConfidence(poseLandmarkerHelper.minPoseTrackingConfidence)
+            viewModel.setMinPosePresenceConfidence(poseLandmarkerHelper.minPosePresenceConfidence)
+            viewModel.setDelegate(poseLandmarkerHelper.currentDelegate)
+
+            // Close the PoseLandmarkerHelper and release resources
+            cameraExecutor.execute { poseLandmarkerHelper.clearPoseLandmarker() }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Start the PoseLandmarkerHelper again when users come back
+        // to the foreground.
+        cameraExecutor.execute {
+            if(this::poseLandmarkerHelper.isInitialized) {
+                if (poseLandmarkerHelper.isClose()) {
+                    poseLandmarkerHelper.setupPoseLandmarker()
+                }
+            }
+        }
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -63,6 +90,17 @@ class  CameraFragment : Fragment() {
         _binding = FragmentCameraBinding.inflate(inflater, container, false)
 
         return binding.root
+    }
+
+    override fun onDestroyView() {
+        _binding = null
+        super.onDestroyView()
+
+        // Shut down our background executor
+        cameraExecutor.shutdown()
+        cameraExecutor.awaitTermination(
+            Long.MAX_VALUE, TimeUnit.NANOSECONDS
+        )
     }
 
     @SuppressLint("MissingPermission")
@@ -96,11 +134,6 @@ class  CameraFragment : Fragment() {
 
         binding.photoButton.setOnClickListener {}
         binding.videoButton.setOnClickListener {}
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        cameraExecutor.shutdown()
     }
 
     private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all { permission ->
