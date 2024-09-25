@@ -20,13 +20,16 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.util.AttributeSet
+import android.util.Log
 import android.view.View
 import androidx.core.content.ContextCompat
 import com.google.mediapipe.tasks.vision.core.RunningMode
 import com.google.mediapipe.tasks.vision.poselandmarker.PoseLandmarker
 import com.google.mediapipe.tasks.vision.poselandmarker.PoseLandmarkerResult
+import kotlin.math.atan
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.math.round
 
 class OverlayView(context: Context?, attrs: AttributeSet?) :
     View(context, attrs) {
@@ -38,6 +41,11 @@ class OverlayView(context: Context?, attrs: AttributeSet?) :
     private var scaleFactor: Float = 1f
     private var imageWidth: Int = 1
     private var imageHeight: Int = 1
+
+    private var x: Float = 0F
+    private var y: Float = 0F
+
+    private var angle: Float = 0F
 
     init {
         initPaints()
@@ -66,13 +74,59 @@ class OverlayView(context: Context?, attrs: AttributeSet?) :
         super.draw(canvas)
         results?.let { poseLandmarkerResult ->
             for(landmark in poseLandmarkerResult.landmarks()) {
+                var count = 0
                 for(normalizedLandmark in landmark) {
                     canvas.drawPoint(
                         normalizedLandmark.x() * imageWidth * scaleFactor,
                         normalizedLandmark.y() * imageHeight * scaleFactor,
                         pointPaint
                     )
+
                 }
+
+                fun isFacingRight(): Boolean {
+                    return landmark[23].z() > landmark[24].z() &&
+                            landmark[25].z() > landmark[26].z() &&
+                            landmark[27].z() > landmark[28].z()
+                }
+
+                fun slope(p1: FloatArray, p2:FloatArray) : Float {
+                    return (p2[1]-p1[1]) / (p2[0]-p1[0])
+                }
+
+                var m1 : Float = 0f
+                var m2 : Float = 0f
+
+                var radAngle : Float = 0f
+                var degree : Double = 0.0
+
+                if(isFacingRight()) {
+                    m1 = slope(floatArrayOf(landmark[26].x(), landmark[26].y()),
+                        floatArrayOf(landmark[24].x(), landmark[24].y()))
+
+                    m2 = slope(floatArrayOf(landmark[26].x(), landmark[26].y()),
+                        floatArrayOf(landmark[28].x(), landmark[28].y()))
+
+                    radAngle = atan((m2-m1)/(1+m1*m2))
+                    degree = 180 - round(Math.toDegrees(radAngle.toDouble()))
+
+                } else {
+                    m1 = slope(floatArrayOf(landmark[25].x(), landmark[25].y()),
+                        floatArrayOf(landmark[23].x(), landmark[23].y()))
+
+                    m2 = slope(floatArrayOf(landmark[25].x(), landmark[25].y()),
+                        floatArrayOf(landmark[27].x(), landmark[27].y()))
+
+                    radAngle = atan((m2-m1)/(1+m1*m2))
+                    degree = round(Math.toDegrees(radAngle.toDouble()))
+
+                    if(degree < 0) {
+                        degree += 180
+                    }
+                }
+
+                Log.d("FACINGRIGHT", isFacingRight().toString())
+                Log.d("DEGREE", degree.toString())
 
                 PoseLandmarker.POSE_LANDMARKS.forEach {
                     canvas.drawLine(
@@ -82,6 +136,8 @@ class OverlayView(context: Context?, attrs: AttributeSet?) :
                         poseLandmarkerResult.landmarks()[0][it.end()].y() * imageHeight * scaleFactor,
                         linePaint)
                 }
+
+
             }
         }
     }
