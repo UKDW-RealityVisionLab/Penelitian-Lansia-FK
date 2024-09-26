@@ -22,7 +22,10 @@ import android.graphics.Paint
 import android.util.AttributeSet
 import android.util.Log
 import android.view.View
+import android.widget.ImageView
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
+import com.example.sinauopencvkotlin.databinding.FragmentGalleryBinding
 import com.google.mediapipe.tasks.vision.core.RunningMode
 import com.google.mediapipe.tasks.vision.poselandmarker.PoseLandmarker
 import com.google.mediapipe.tasks.vision.poselandmarker.PoseLandmarkerResult
@@ -74,7 +77,6 @@ class OverlayView(context: Context?, attrs: AttributeSet?) :
         super.draw(canvas)
         results?.let { poseLandmarkerResult ->
             for(landmark in poseLandmarkerResult.landmarks()) {
-                var count = 0
                 for(normalizedLandmark in landmark) {
                     canvas.drawPoint(
                         normalizedLandmark.x() * imageWidth * scaleFactor,
@@ -94,11 +96,11 @@ class OverlayView(context: Context?, attrs: AttributeSet?) :
                     return (p2[1]-p1[1]) / (p2[0]-p1[0])
                 }
 
-                var m1 : Float = 0f
-                var m2 : Float = 0f
+                var m1 = 0f
+                var m2 = 0f
 
-                var radAngle : Float = 0f
-                var degree : Double = 0.0
+                var radAngle = 0f
+                var degree = 0.0
 
                 if(isFacingRight()) {
                     m1 = slope(floatArrayOf(landmark[26].x(), landmark[26].y()),
@@ -109,6 +111,10 @@ class OverlayView(context: Context?, attrs: AttributeSet?) :
 
                     radAngle = atan((m2-m1)/(1+m1*m2))
                     degree = 180 - round(Math.toDegrees(radAngle.toDouble()))
+
+                    if(degree > 180) {
+                        degree = 360 - degree
+                    }
 
                 } else {
                     m1 = slope(floatArrayOf(landmark[25].x(), landmark[25].y()),
@@ -136,8 +142,6 @@ class OverlayView(context: Context?, attrs: AttributeSet?) :
                         poseLandmarkerResult.landmarks()[0][it.end()].y() * imageHeight * scaleFactor,
                         linePaint)
                 }
-
-
             }
         }
     }

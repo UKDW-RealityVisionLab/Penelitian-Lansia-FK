@@ -1,50 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".GalleryFragment">
 
-    <androidx.coordinatorlayout.widget.CoordinatorLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/coordinatorLayout"
         android:layout_width="match_parent"
-        android:layout_height="550dp"
-        android:id="@+id/coordinatorLayout">
+        android:layout_height="match_parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
-        <ImageView
-            android:layout_width="match_parent"
-            android:layout_height="550dp"
-            android:id="@+id/imageView"
-            android:background="@color/black"
-            android:layout_gravity="center_horizontal" />
-
-        <com.example.sinauopencvkotlin.OverlayView
-            android:id="@+id/overlay"
+        <RelativeLayout
+            android:id="@+id/relativeLayout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_centerInParent="true" />
+            android:layout_marginBottom="75dp">
 
-        <androidx.core.widget.ContentLoadingProgressBar
-            android:id="@+id/progress"
-            style="?android:attr/progressBarStyle"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_centerInParent="true"
-            android:indeterminate="true"
-            android:theme="@style/Theme.SinauOpenCVKotlin"
-            android:visibility="gone" />
+            <ImageView
+                android:id="@+id/imageView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/black"
+                android:scaleType="fitStart" />
 
-    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+            <com.example.sinauopencvkotlin.OverlayView
+                android:id="@+id/overlay"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_centerInParent="true" />
 
-    <Button
-        android:id="@+id/pickerButton"
-        android:layout_width="match_parent"
-        android:layout_height="75dp"
-        android:layout_below="@+id/coordinatorLayout"
-        android:layout_centerHorizontal="true"
-        android:text="@string/pick_image" />
+            <androidx.core.widget.ContentLoadingProgressBar
+                android:id="@+id/progress"
+                style="?android:attr/progressBarStyle"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_centerInParent="true"
+                android:indeterminate="true"
+                android:theme="@style/Theme.SinauOpenCVKotlin"
+                android:visibility="gone" />
+
+        </RelativeLayout>
+
+        <Button
+            android:id="@+id/pickerButton"
+            android:layout_width="match_parent"
+            android:layout_height="75dp"
+            android:layout_below="@+id/coordinatorLayout"
+            android:layout_centerHorizontal="true"
+            android:text="@string/pick_image"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/relativeLayout"
+            app:layout_constraintVertical_bias="0.141" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 
-
-
-
-</RelativeLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
