@@ -1,4 +1,4 @@
-package com.example.sinauopencvkotlin
+package com.example.sinauopencvkotlin.fragments
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -26,6 +26,8 @@ import androidx.camera.video.Recorder
 import androidx.camera.video.Recording
 import androidx.camera.video.VideoCapture
 import androidx.core.content.ContextCompat
+import com.example.sinauopencvkotlin.mediapipe.MainViewModel
+import com.example.sinauopencvkotlin.mediapipe.PoseLandmarkerHelper
 import com.example.sinauopencvkotlin.databinding.FragmentCameraBinding
 import java.nio.ByteBuffer
 import java.util.concurrent.ExecutorService
@@ -33,10 +35,7 @@ import java.util.concurrent.Executors
 
 //Mediapipe
 import com.google.mediapipe.tasks.vision.core.RunningMode
-import com.google.mediapipe.tasks.vision.poselandmarker.PoseLandmarkerResult
 import java.util.concurrent.TimeUnit
-import kotlin.math.atan
-import kotlin.math.round
 
 typealias LumaListener = (luma : Double) -> Unit
 
@@ -59,6 +58,8 @@ class  CameraFragment : Fragment() {
 
     private var _binding: FragmentCameraBinding? = null
     private val binding get() = _binding!!
+
+    private var angle = 0.0
 
     override fun onPause() {
         super.onPause()
@@ -258,13 +259,13 @@ class  CameraFragment : Fragment() {
         }
     }
 
+    @SuppressLint("SetTextI18n")
     private fun detectPose(imageProxy: ImageProxy) {
         if(this::poseLandmarkerHelper.isInitialized) {
             poseLandmarkerHelper.detectLiveStream(
                 imageProxy = imageProxy,
                 isFrontCamera = cameraFacing == CameraSelector.LENS_FACING_FRONT
             )
-            binding.textAngle.text = binding.overlay.getAngle().toString()
         }
     }
 
@@ -289,6 +290,9 @@ class  CameraFragment : Fragment() {
 
                 // Force a redraw
                 binding.overlay.invalidate()
+                angle = binding.overlay.getAngle()
+                binding.textAngle.text = angle.toString()
+                binding.textPercentage.text = String.format("%.2f", angle/1.35) + "%"
             }
         }
     }
@@ -298,8 +302,7 @@ class  CameraFragment : Fragment() {
         private const val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"
         private val REQUIRED_PERMISSIONS =
             mutableListOf (
-                Manifest.permission.CAMERA,
-                Manifest.permission.RECORD_AUDIO
+                Manifest.permission.CAMERA
             ).apply {
                 if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
                     add(Manifest.permission.WRITE_EXTERNAL_STORAGE)

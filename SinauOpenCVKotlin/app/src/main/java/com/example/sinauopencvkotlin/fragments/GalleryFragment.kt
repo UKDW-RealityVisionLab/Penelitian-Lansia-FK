@@ -1,4 +1,4 @@
-package com.example.sinauopencvkotlin
+package com.example.sinauopencvkotlin.fragments
 
 import android.app.Activity
 import android.content.Intent
@@ -12,17 +12,15 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import com.example.sinauopencvkotlin.mediapipe.MainViewModel
+import com.example.sinauopencvkotlin.mediapipe.PoseLandmarkerHelper
 import com.example.sinauopencvkotlin.databinding.FragmentGalleryBinding
-import com.google.common.net.MediaType
 import com.google.mediapipe.tasks.vision.core.RunningMode
 import org.opencv.android.NativeCameraView.TAG
-import org.opencv.android.Utils
 import org.opencv.core.Mat
 import java.io.IOException
 import java.util.concurrent.Executors
@@ -36,6 +34,8 @@ class GalleryFragment : Fragment() {
 
     private var bitmap: Bitmap? = null
     private var mat: Mat? = null
+
+    var angle = 0.0
 
     companion object {
         private var SELECT_CODE = 0
@@ -131,7 +131,9 @@ class GalleryFragment : Fragment() {
                         poseLandmarkerHelper.clearPoseLandmarker()
                     }
 
-                    binding.textAngle.text = binding.overlay.getAngle().toString()
+                    angle = binding.overlay.getAngle()
+                    binding.textAngle.text = angle.toString()
+                    binding.textPercentage.text = String.format("%.2f", angle/1.35) + "%"
                 }
             }
     }

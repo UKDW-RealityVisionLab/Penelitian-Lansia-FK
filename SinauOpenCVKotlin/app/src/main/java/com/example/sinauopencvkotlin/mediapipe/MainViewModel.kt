@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.example.sinauopencvkotlin
+package com.example.sinauopencvkotlin.mediapipe
 
 import androidx.lifecycle.ViewModel
 
@@ -26,10 +26,10 @@ class MainViewModel : ViewModel() {
     private var _delegate: Int = PoseLandmarkerHelper.DELEGATE_CPU
     private var _minPoseDetectionConfidence: Float =
         PoseLandmarkerHelper.DEFAULT_POSE_DETECTION_CONFIDENCE
-    private var _minPoseTrackingConfidence: Float = PoseLandmarkerHelper
-        .DEFAULT_POSE_TRACKING_CONFIDENCE
-    private var _minPosePresenceConfidence: Float = PoseLandmarkerHelper
-        .DEFAULT_POSE_PRESENCE_CONFIDENCE
+    private var _minPoseTrackingConfidence: Float =
+        PoseLandmarkerHelper.DEFAULT_POSE_TRACKING_CONFIDENCE
+    private var _minPosePresenceConfidence: Float =
+        PoseLandmarkerHelper.DEFAULT_POSE_PRESENCE_CONFIDENCE
 
     val currentDelegate: Int get() = _delegate
     val currentModel: Int get() = _model

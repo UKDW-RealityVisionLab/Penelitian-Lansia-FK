@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".GalleryFragment">
+    tools:context=".fragments.GalleryFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constLayout"
@@ -28,7 +28,7 @@
                 android:scaleType="fitStart"
                 android:contentDescription="@null" />
 
-            <com.example.sinauopencvkotlin.OverlayView
+            <com.example.sinauopencvkotlin.mediapipe.OverlayView
                 android:id="@+id/overlay"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -46,18 +46,50 @@
 
         </RelativeLayout>
 
-        <TextView
-            android:id="@+id/textAngle"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="25dp"
-            android:background="@color/white"
-            android:text=""
-            android:textAlignment="center"
-            android:textSize="20sp"
-            android:textColor="@color/black"
+            android:orientation="horizontal"
             app:layout_constraintBottom_toTopOf="@+id/pickerButton"
-            app:layout_constraintTop_toBottomOf="@+id/relativeLayout"/>
+            app:layout_constraintTop_toBottomOf="@+id/relativeLayout"
+            android:layout_marginBottom="25dp"
+            android:baselineAligned="false">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
+
+                <TextView
+                    android:id="@+id/textAngle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/white"
+                    android:text=""
+                    android:textAlignment="viewStart"
+                    android:textSize="20sp"
+                    android:textColor="@color/black" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
+
+                <TextView
+                    android:id="@+id/textPercentage"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/white"
+                    android:text=""
+                    android:textAlignment="viewEnd"
+                    android:textSize="20sp"
+                    android:textColor="@color/black"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
 
         <Button
             android:id="@+id/pickerButton"

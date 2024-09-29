@@ -13,19 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.example.sinauopencvkotlin
+package com.example.sinauopencvkotlin.mediapipe
 
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.util.AttributeSet
-import android.util.Log
 import android.view.View
-import android.widget.ImageView
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.Fragment
-import com.example.sinauopencvkotlin.databinding.FragmentGalleryBinding
+import com.example.sinauopencvkotlin.R
 import com.google.mediapipe.tasks.vision.core.RunningMode
 import com.google.mediapipe.tasks.vision.poselandmarker.PoseLandmarker
 import com.google.mediapipe.tasks.vision.poselandmarker.PoseLandmarkerResult
@@ -112,6 +109,8 @@ class OverlayView(context: Context?, attrs: AttributeSet?) :
                 var radAngle = 0f
                 var degree = 0.0
 
+                var percentage = 0.0
+
                 if(isFacingRight()) {
                     m1 = slope(floatArrayOf(landmark[26].x(), landmark[26].y()),
                         floatArrayOf(landmark[24].x(), landmark[24].y()))
@@ -126,6 +125,8 @@ class OverlayView(context: Context?, attrs: AttributeSet?) :
                         degree -= 180
                     }
 
+                    degree = 180 - degree
+
                 } else {
                     m1 = slope(floatArrayOf(landmark[25].x(), landmark[25].y()),
                         floatArrayOf(landmark[23].x(), landmark[23].y()))
@@ -139,10 +140,9 @@ class OverlayView(context: Context?, attrs: AttributeSet?) :
                     if(degree < 0) {
                         degree += 180
                     }
-                }
 
-                Log.d("FACINGRIGHT", isFacingRight().toString())
-                Log.d("DEGREE", degree.toString())
+                    degree = 180 - degree
+                }
 
                 return degree
             }

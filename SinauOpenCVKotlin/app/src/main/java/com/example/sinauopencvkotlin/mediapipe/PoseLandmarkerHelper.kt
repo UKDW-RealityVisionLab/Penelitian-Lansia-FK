@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.example.sinauopencvkotlin
+package com.example.sinauopencvkotlin.mediapipe
 
 import android.content.Context
 import android.graphics.Bitmap
@@ -24,6 +24,7 @@ import android.os.SystemClock
 import android.util.Log
 import androidx.annotation.VisibleForTesting
 import androidx.camera.core.ImageProxy
+import com.example.sinauopencvkotlin.fragments.CameraFragment
 import com.google.mediapipe.framework.image.BitmapImageBuilder
 import com.google.mediapipe.framework.image.MPImage
 import com.google.mediapipe.tasks.core.BaseOptions
