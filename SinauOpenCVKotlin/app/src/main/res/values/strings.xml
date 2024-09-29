@@ -3,7 +3,5 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="pick_image">Pick Image</string>
-    <string name="take_picture">Take Picture</string>
-    <string name="record_video">Record Video</string>
-    <string name="stop_capture">Stop Recording</string>
+    <string name="create_chart">Create Chart</string>
 </resources>

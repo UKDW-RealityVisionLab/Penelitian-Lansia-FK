@@ -7,7 +7,7 @@
     tools:context=".GalleryFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/coordinatorLayout"
+        android:id="@+id/constLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -25,7 +25,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@color/black"
-                android:scaleType="fitStart" />
+                android:scaleType="fitStart"
+                android:contentDescription="@null" />
 
             <com.example.sinauopencvkotlin.OverlayView
                 android:id="@+id/overlay"
@@ -45,11 +46,24 @@
 
         </RelativeLayout>
 
+        <TextView
+            android:id="@+id/textAngle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="25dp"
+            android:background="@color/white"
+            android:text=""
+            android:textAlignment="center"
+            android:textSize="20sp"
+            android:textColor="@color/black"
+            app:layout_constraintBottom_toTopOf="@+id/pickerButton"
+            app:layout_constraintTop_toBottomOf="@+id/relativeLayout"/>
+
         <Button
             android:id="@+id/pickerButton"
             android:layout_width="match_parent"
             android:layout_height="75dp"
-            android:layout_below="@+id/coordinatorLayout"
+            android:layout_below="@+id/constLayout"
             android:layout_centerHorizontal="true"
             android:text="@string/pick_image"
             app:layout_constraintBottom_toBottomOf="parent"

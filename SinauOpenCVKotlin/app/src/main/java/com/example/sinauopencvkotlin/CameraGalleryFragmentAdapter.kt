@@ -18,4 +18,6 @@ class CameraGalleryFragmentAdapter(
         else CameraFragment()
 
     }
+
+
 }

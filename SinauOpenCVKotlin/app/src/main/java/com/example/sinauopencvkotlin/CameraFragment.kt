@@ -33,7 +33,10 @@ import java.util.concurrent.Executors
 
 //Mediapipe
 import com.google.mediapipe.tasks.vision.core.RunningMode
+import com.google.mediapipe.tasks.vision.poselandmarker.PoseLandmarkerResult
 import java.util.concurrent.TimeUnit
+import kotlin.math.atan
+import kotlin.math.round
 
 typealias LumaListener = (luma : Double) -> Unit
 
@@ -131,9 +134,6 @@ class  CameraFragment : Fragment() {
                 poseLandmarkerHelperListener = this
             )
         }
-
-        binding.photoButton.setOnClickListener {}
-        binding.videoButton.setOnClickListener {}
     }
 
     private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all { permission ->
@@ -264,6 +264,7 @@ class  CameraFragment : Fragment() {
                 imageProxy = imageProxy,
                 isFrontCamera = cameraFacing == CameraSelector.LENS_FACING_FRONT
             )
+            binding.textAngle.text = binding.overlay.getAngle().toString()
         }
     }
 

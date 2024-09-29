@@ -86,14 +86,6 @@ class GalleryFragment : Fragment() {
         super.onPause()
     }
 
-//    fun pickImage() {
-//        binding.pickerButton.setOnClickListener {
-//            val intent = Intent(Intent.ACTION_PICK)
-//            intent.type = "image/*"
-//            startActivityForResult(intent, SELECT_CODE)
-//        }
-//    }
-
     private fun runDetectionOnImage(uri: Uri) {
         galleryExecutor = Executors.newSingleThreadScheduledExecutor()
         updateDisplayView(MediaType.IMAGE)
@@ -138,16 +130,18 @@ class GalleryFragment : Fragment() {
 
                         poseLandmarkerHelper.clearPoseLandmarker()
                     }
+
+                    binding.textAngle.text = binding.overlay.getAngle().toString()
                 }
             }
     }
 
-    fun updateDisplayView(mediaType: MediaType) {
+    private fun updateDisplayView(mediaType: MediaType) {
         binding.imageView.visibility =
             if (mediaType == MediaType.IMAGE) View.VISIBLE else View.GONE
     }
 
-    fun loadMediaType(uri: Uri): MediaType {
+    private fun loadMediaType(uri: Uri): MediaType {
         val mimeType = context?.contentResolver?.getType(uri)
         mimeType?.let {
             if (mimeType.startsWith("image")) return MediaType.IMAGE
@@ -180,8 +174,6 @@ class GalleryFragment : Fragment() {
                     imageUri
                 )
                 binding.imageView.setImageBitmap(bitmap)
-//                mat = Mat()
-//                Utils.bitmapToMat(bitmap, mat)
             } catch (e: IOException) {
                 e.printStackTrace()
             }

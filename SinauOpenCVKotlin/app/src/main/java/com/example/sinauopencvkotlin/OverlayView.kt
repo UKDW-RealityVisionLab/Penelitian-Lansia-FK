@@ -45,11 +45,6 @@ class OverlayView(context: Context?, attrs: AttributeSet?) :
     private var imageWidth: Int = 1
     private var imageHeight: Int = 1
 
-    private var x: Float = 0F
-    private var y: Float = 0F
-
-    private var angle: Float = 0F
-
     init {
         initPaints()
     }
@@ -86,6 +81,21 @@ class OverlayView(context: Context?, attrs: AttributeSet?) :
 
                 }
 
+                PoseLandmarker.POSE_LANDMARKS.forEach {
+                    canvas.drawLine(
+                        poseLandmarkerResult.landmarks()[0][it!!.start()].x() * imageWidth * scaleFactor,
+                        poseLandmarkerResult.landmarks()[0][it.start()].y() * imageHeight * scaleFactor,
+                        poseLandmarkerResult.landmarks()[0][it.end()].x() * imageWidth * scaleFactor,
+                        poseLandmarkerResult.landmarks()[0][it.end()].y() * imageHeight * scaleFactor,
+                        linePaint)
+                }
+            }
+        }
+    }
+
+    fun getAngle() : Double {
+        results?.let { poseLandmarkerResult ->
+            for(landmark in poseLandmarkerResult.landmarks()) {
                 fun isFacingRight(): Boolean {
                     return landmark[23].z() > landmark[24].z() &&
                             landmark[25].z() > landmark[26].z() &&
@@ -113,7 +123,7 @@ class OverlayView(context: Context?, attrs: AttributeSet?) :
                     degree = 180 - round(Math.toDegrees(radAngle.toDouble()))
 
                     if(degree > 180) {
-                        degree = 360 - degree
+                        degree -= 180
                     }
 
                 } else {
@@ -134,16 +144,10 @@ class OverlayView(context: Context?, attrs: AttributeSet?) :
                 Log.d("FACINGRIGHT", isFacingRight().toString())
                 Log.d("DEGREE", degree.toString())
 
-                PoseLandmarker.POSE_LANDMARKS.forEach {
-                    canvas.drawLine(
-                        poseLandmarkerResult.landmarks()[0][it!!.start()].x() * imageWidth * scaleFactor,
-                        poseLandmarkerResult.landmarks()[0][it.start()].y() * imageHeight * scaleFactor,
-                        poseLandmarkerResult.landmarks()[0][it.end()].x() * imageWidth * scaleFactor,
-                        poseLandmarkerResult.landmarks()[0][it.end()].y() * imageHeight * scaleFactor,
-                        linePaint)
-                }
+                return degree
             }
         }
+        return 0.0
     }
 
     fun setResults(
@@ -173,6 +177,6 @@ class OverlayView(context: Context?, attrs: AttributeSet?) :
     }
 
     companion object {
-        private const val LANDMARK_STROKE_WIDTH = 12F
+        private const val LANDMARK_STROKE_WIDTH = 10F
     }
 }
