@@ -2,10 +2,16 @@ package com.example.sinauopencvkotlin.fragments
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
+import android.icu.text.AlphabeticIndex
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.os.Parcel
+import android.os.Parcelable
 import android.util.Log
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -26,12 +32,18 @@ import androidx.camera.video.Recorder
 import androidx.camera.video.Recording
 import androidx.camera.video.VideoCapture
 import androidx.core.content.ContextCompat
+import androidx.navigation.findNavController
+import androidx.navigation.fragment.findNavController
+import com.example.sinauopencvkotlin.ChartActivity
+import com.example.sinauopencvkotlin.MainActivity
+import com.example.sinauopencvkotlin.R
 import com.example.sinauopencvkotlin.mediapipe.MainViewModel
 import com.example.sinauopencvkotlin.mediapipe.PoseLandmarkerHelper
 import com.example.sinauopencvkotlin.databinding.FragmentCameraBinding
 import java.nio.ByteBuffer
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+import com.example.sinauopencvkotlin.Record
 
 //Mediapipe
 import com.google.mediapipe.tasks.vision.core.RunningMode
@@ -60,6 +72,9 @@ class  CameraFragment : Fragment() {
     private val binding get() = _binding!!
 
     private var angle = 0.0
+    private var percent = 0.0
+
+    private var recordResult: MutableList<Record> = ArrayList()
 
     override fun onPause() {
         super.onPause()
@@ -77,6 +92,14 @@ class  CameraFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         // Start the PoseLandmarkerHelper again when users come back
+        binding.viewFinder.post {
+            if(allPermissionsGranted()) {
+                startCamera()
+            } else {
+                requestPermissions()
+            }
+        }
+
         // to the foreground.
         cameraExecutor.execute {
             if(this::poseLandmarkerHelper.isInitialized) {
@@ -92,6 +115,35 @@ class  CameraFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentCameraBinding.inflate(inflater, container, false)
+
+        binding.recordButton.setOnClickListener {
+            binding.recordButton.text = getString(R.string.stop_record)
+            var time = 0.0
+            var count = 0
+
+            val handler = Handler(Looper.getMainLooper())
+            val runnable = object : Runnable {
+                override fun run() {
+                    if(time < 7) {
+                        count++
+                        time+=0.25
+                        recordResult.add(Record(count, percent))
+                        handler.postDelayed(this, 250)
+                    } else {
+                        handler.removeCallbacks(this)
+                        binding.recordButton.text = getString(R.string.start_record)
+                    }
+                }
+            }
+            handler.post(runnable)
+        }
+
+        binding.chartButton.setOnClickListener {
+            var intent = Intent(activity, ChartActivity::class.java)
+            intent.putParcelableArrayListExtra("romData", ArrayList(recordResult))
+
+            startActivity(intent)
+        }
 
         return binding.root
     }
@@ -292,7 +344,8 @@ class  CameraFragment : Fragment() {
                 binding.overlay.invalidate()
                 angle = binding.overlay.getAngle()
                 binding.textAngle.text = angle.toString()
-                binding.textPercentage.text = String.format("%.2f", angle/1.35) + "%"
+                percent = angle/1.35
+                binding.textPercentage.text = String.format("%.2f", percent) + "%"
             }
         }
     }
@@ -310,26 +363,4 @@ class  CameraFragment : Fragment() {
             }.toTypedArray()
     }
 
-}
-
-private class LuminosityAnalyzer(private val listener: LumaListener) : ImageAnalysis.Analyzer {
-
-    private fun ByteBuffer.toByteArray(): ByteArray {
-        rewind()    // Rewind the buffer to zero
-        val data = ByteArray(remaining())
-        get(data)   // Copy the buffer into a byte array
-        return data // Return the byte array
-    }
-
-    override fun analyze(image: ImageProxy) {
-
-        val buffer = image.planes[0].buffer
-        val data = buffer.toByteArray()
-        val pixels = data.map { it.toInt() and 0xFF }
-        val luma = pixels.average()
-
-        listener(luma)
-
-        image.close()
-    }
 }

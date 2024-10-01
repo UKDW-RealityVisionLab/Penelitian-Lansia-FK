@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/navigator"
+    app:startDestination="@id/cameraFragment">
+
+    <fragment
+        android:id="@+id/cameraFragment"
+        android:name="com.example.sinauopencvkotlin.fragments.CameraFragment"
+        android:label="fragment_camera"
+        tools:layout="@layout/fragment_camera"
+        app:defaultNavHost="true">
+        <action
+            android:id="@+id/action_cameraFragment_to_chartFragment"
+            app:destination="@id/chartFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/chartFragment"
+        android:name="com.example.sinauopencvkotlin.ChartActivity"
+        android:label="fragment_chart"
+        tools:layout="@layout/activity_chart" />
+</navigation>
