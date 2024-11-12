@@ -6,4 +6,5 @@
     <string name="create_chart">Create Chart</string>
     <string name="start_record">Start Record</string>
     <string name="stop_record">Stop Record</string>
+    <string name="export_csv">Export CSV</string>
 </resources>

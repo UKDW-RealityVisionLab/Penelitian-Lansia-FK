@@ -3,7 +3,9 @@ package com.example.sinauopencvkotlin.fragments
 import android.app.Activity
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.graphics.ImageDecoder
+import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -12,8 +14,10 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.graphics.drawable.toBitmap
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.example.sinauopencvkotlin.mediapipe.MainViewModel
@@ -103,7 +107,13 @@ class GalleryFragment : Fragment() {
         }
             .copy(Bitmap.Config.ARGB_8888, true)
             ?.let { bitmap ->
-                binding.imageView.setImageBitmap(bitmap)
+                val ratio = bitmap.width.toFloat() / bitmap.height.toFloat()
+                val width = 600
+                val height = (600 / ratio).toInt()
+
+                val scaledBitmap = Bitmap.createScaledBitmap(bitmap, width, height, true)
+
+                binding.imageView.setImageBitmap(scaledBitmap)
 
                 // Run pose landmarker on the input image
                 galleryExecutor.execute {
@@ -118,18 +128,20 @@ class GalleryFragment : Fragment() {
                             currentDelegate = viewModel.currentDelegate
                         )
 
-                    poseLandmarkerHelper.detectImage(bitmap)?.let { result ->
-                        activity?.runOnUiThread {
-                            binding.overlay.setResults(
-                                result.results[0],
-                                bitmap.height,
-                                bitmap.width,
-                                RunningMode.IMAGE
-                            )
-                        } ?: run { Log.e(TAG, "Error running pose landmarker.") }
+                    val detectionImage = centerCropBitmap(binding.imageView.drawable.toBitmap(), binding.imageView.width, binding.imageView.height)
 
-                        poseLandmarkerHelper.clearPoseLandmarker()
-                    }
+                    poseLandmarkerHelper.detectImage(detectionImage)?.let { result ->
+                            activity?.runOnUiThread {
+                                binding.overlay.setResults(
+                                    result.results[0],
+                                    detectionImage.height,
+                                    detectionImage.width,
+                                    RunningMode.IMAGE
+                                )
+                            } ?: run { Log.e(TAG, "Error running pose landmarker.") }
+
+                            poseLandmarkerHelper.clearPoseLandmarker()
+                        }
 
                     angle = binding.overlay.getAngle()
                     binding.textAngle.text = angle.toString()
@@ -137,6 +149,32 @@ class GalleryFragment : Fragment() {
                 }
             }
     }
+
+    private fun centerCropBitmap(source: Bitmap, width: Int, height: Int): Bitmap {
+        val sourceWidth = source.width
+        val sourceHeight = source.height
+
+        val xOffset: Int
+        val yOffset: Int
+        val scaledWidth: Int
+        val scaledHeight: Int
+
+        // Calculate aspect ratios
+        if (sourceWidth * height > width * sourceHeight) {
+            scaledHeight = sourceHeight
+            scaledWidth = (width.toFloat() / height.toFloat() * sourceHeight).toInt()
+            xOffset = (sourceWidth - scaledWidth) / 2
+            yOffset = 0
+        } else {
+            scaledWidth = sourceWidth
+            scaledHeight = (height.toFloat() / width.toFloat() * sourceWidth).toInt()
+            xOffset = 0
+            yOffset = (sourceHeight - scaledHeight) / 2
+        }
+
+        return Bitmap.createBitmap(source, xOffset, yOffset, scaledWidth, scaledHeight)
+    }
+
 
     private fun updateDisplayView(mediaType: MediaType) {
         binding.imageView.visibility =

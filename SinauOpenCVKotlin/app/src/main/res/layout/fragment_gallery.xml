@@ -25,7 +25,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@color/black"
-                android:scaleType="fitStart"
+                android:scaleType="centerCrop"
                 android:contentDescription="@null" />
 
             <com.example.sinauopencvkotlin.mediapipe.OverlayView
