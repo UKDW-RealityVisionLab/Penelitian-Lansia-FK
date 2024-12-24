@@ -3,9 +3,9 @@ package com.example.sinauopencvkotlin
 import android.os.Parcel
 import android.os.Parcelable
 
-data class Record(val sec: Int, val angle: Double) : Parcelable {
+data class Record(val sec: Double, val angle: Double) : Parcelable {
     constructor(parcel: Parcel) : this(
-        parcel.readInt(),
+        parcel.readDouble(),
         parcel.readDouble()
     )
 
@@ -13,7 +13,7 @@ data class Record(val sec: Int, val angle: Double) : Parcelable {
     override fun describeContents(): Int = 0
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeInt(sec)
+        parcel.writeDouble(sec)
         parcel.writeDouble(angle)
     }
 
