@@ -23,9 +23,8 @@ import androidx.fragment.app.activityViewModels
 import com.example.sinauopencvkotlin.mediapipe.MainViewModel
 import com.example.sinauopencvkotlin.mediapipe.PoseLandmarkerHelper
 import com.example.sinauopencvkotlin.databinding.FragmentGalleryBinding
+import com.example.sinauopencvkotlin.mediapipe.PoseLandmarkerHelper.Companion.TAG
 import com.google.mediapipe.tasks.vision.core.RunningMode
-import org.opencv.android.NativeCameraView.TAG
-import org.opencv.core.Mat
 import java.io.IOException
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
@@ -37,7 +36,6 @@ class GalleryFragment : Fragment() {
     }
 
     private var bitmap: Bitmap? = null
-    private var mat: Mat? = null
 
     var angle = 0.0
 

@@ -16,4 +16,3 @@ dependencyResolutionManagement {
 
 rootProject.name = "Knee ROM Detector"
 include ':app'
-include ':opencv'

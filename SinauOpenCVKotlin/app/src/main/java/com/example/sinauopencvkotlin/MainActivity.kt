@@ -6,7 +6,6 @@ import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayout
-import org.opencv.android.OpenCVLoader
 
 class MainActivity : AppCompatActivity() {
 
